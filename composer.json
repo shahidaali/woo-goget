@@ -1,0 +1,13 @@
+{
+    "name": "connectpx/woo-goget",
+    "description": "Wordpress plugin to integrate Goget delivery with woocommerce.",
+    "type": "wordpress-plugin",
+    "autoload": {
+        "psr-4": {
+            "ConnectPX\\WooGoget\\": "src"
+        }
+    },
+    "require": {
+        "php-curl-class/php-curl-class": "^8.8"
+    }
+}
