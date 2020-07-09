@@ -97,17 +97,14 @@ class WooGogetApi {
         $curl->setHeader('Content-Type', 'application/json');
 
         $curl->{$method}($url, $data);
-
-        if ($curl->error) {
-		    $this->errors['curl_error'] = 'Error: ' . $curl->errorCode . ': ' . $curl->errorMessage;
-		} else {
-			$this->response = $curl->response;
-		}
-
+		$this->response = $curl->response;
 		$this->curl = $curl;
 
 		if(!$this->isResponseSuccess()) {
 			$this->errors['api_error'] = $this->getResponseMessage();
+		}
+		else if ($curl->error) {
+		    $this->errors['curl_error'] = 'Error: ' . $curl->errorCode . ': ' . $curl->errorMessage;
 		}
 
 		return $this->response;
@@ -274,6 +271,46 @@ class WooGogetApi {
 
 		if(!$this->isError()) {
 			return $this->getResponseParam('fee', 0);
+		}
+
+		return false;
+    }
+
+    /**
+	 * createJob
+	 *
+	 * Create new Job
+	 *
+	 * @since	1.0.0
+	 *
+	 * @param	void
+	 * @return	void
+	 */	
+	public function createJob($data = []) {
+		$this->requestApi('jobs', 'post', json_encode($data));
+
+		if(!$this->isError()) {
+			return $this->getResponseData();
+		}
+
+		return false;
+    }
+
+    /**
+	 * jobDetail
+	 *
+	 * Get job detail
+	 *
+	 * @since	1.0.0
+	 *
+	 * @param	void
+	 * @return	void
+	 */	
+	public function jobDetail($job_id, $data = []) {
+		$this->requestApi('jobs/' . $job_id, 'get', json_encode($data));
+
+		if(!$this->isError()) {
+			return $this->getResponseParam();
 		}
 
 		return false;

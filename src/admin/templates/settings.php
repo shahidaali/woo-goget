@@ -6,9 +6,9 @@ $start = new \DateTime('00:00');
 $times = 24 * 2; // 24 hours * 30 mins in an hour
 
 for ($i = 0; $i < $times-1; $i++) {
-    $time_options[] = $start->add(new \DateInterval('PT30M'))->format('H:i');
+	$time = $start->add(new \DateInterval('PT30M'))->format('H:i');
+    $time_options[$time] = $time;
 }
-
 $warehouse = [
 	'fields' => [
 		[
@@ -49,6 +49,9 @@ $warehouse = [
 			'name' => 'contact_person_phone',
 		],
 		[
+			'name' => 'contact_person_email',
+		],
+		[
 			'name' => 'pickup_notes',
 			'info' => 'Default comment for pick up point',
 			'type' => 'textarea',
@@ -78,41 +81,41 @@ $warehouse = [
 					<input name="woo_goget_settings[is_sandbox]" type="checkbox" id="is_sandbox" value="1" <?php echo WooGogetUtil::is_checked( $this->get_option('is_sandbox'), 1 ); ?>> Yes</label></td>
 				</tr>
 				<tr>
-					<th scope="row"><?php _e('GoGet API Key'); ?></th>
+					<th scope="row"><?php _e('GoGet Staging API Key'); ?></th>
+					<td><input type="text" name="woo_goget_settings[staging_api_key]" value="<?php echo $this->get_option('staging_api_key'); ?>" size="60"></td>
+				</tr>
+				<tr>
+					<th scope="row"><?php _e('GoGet Live API Key'); ?></th>
 					<td><input type="text" name="woo_goget_settings[api_key]" value="<?php echo $this->get_option('api_key'); ?>" size="60"></td>
+				</tr>
+				<tr>
+					<th scope="row" colspan="2"><h2><?php _e('Email Templates'); ?></h2></th>
+				</tr>
+				<tr>
+					<th scope="row"><?php _e('New Job Customer Email'); ?></th>
+					<td><textarea name="woo_goget_settings[new_job_customer_email_tpl]" cols="65" rows="5"><?php echo $this->get_option('new_job_customer_email_tpl'); ?></textarea><br><small>This email is sent to customer when new job created on goget.</small><br><small>Tokens available: [GOGETTER_DETAIL] [CUSTOMER_NAME]</small></td>
+				</tr>
+				<tr>
+					<th scope="row"><?php _e('New Job Admin Email'); ?></th>
+					<td><textarea name="woo_goget_settings[new_job_admin_email_tpl]" cols="65" rows="5"><?php echo $this->get_option('new_job_admin_email_tpl'); ?></textarea><br><small>This email is sent to admin when new job created on goget.</small><br><small>Tokens available: [GOGETTER_DETAIL] [ADMIN_NAME]</small></td>
+				</tr>
+				<tr>
+					<th scope="row" colspan="2"><h2><?php _e('Geo Coding'); ?></h2></th>
+				</tr>
+				<tr>
+					<th scope="row"><?php _e('Google API Key'); ?></th>
+					<td><input type="text" name="woo_goget_settings[google_api_key]" value="<?php echo $this->get_option('google_api_key'); ?>" size="60"></td>
 				</tr>
 				<tr>
 					<th scope="row" colspan="2"><h2><?php _e('Warehouse Settings'); ?></h2></th>
 				</tr>
 				<?php foreach ($warehouse['fields'] as $key => $field) { ?>
 					<?php 
-					$name = $field['name'];
-					$label = strtoupper(str_replace("_", " ", $name));
-					$info = isset($field['info']) ? $field['info'] : '';
-					$type = isset($field['type']) ? $field['type'] : 'text';
-					$default = isset($field['default']) ? $field['default'] : '';
-					$options = isset($field['options']) ? $field['options'] : [];
-					$value = $this->get_option(['warehouse', $name], $default);
-					$name = "woo_goget_settings[warehouse][{$name}]";
-					
-					$input = "";
-					if($type == 'select') {
-						$input = "<select name=\"{$name}\">"
-							. WooGogetUtil::select_options($options, $value, "", false)
-							. "</select>";
-					}
-					else if($type == 'textarea') {
-						$input = "<textarea name=\"{$name}\" cols=\"63\" rows=\"5\">{$value}</textarea>";	
-					} else {
-						$input = "<input type=\"{$type}\" value=\"{$value}\" name=\"{$name}\" size=\"60\">";	
-					}
-					if($info) {
-						$input .= "<br><small>{$info}</small>";
-					}
+					$field_info = $this->admin_field($field, 'warehouse');
 					?>
 					<tr>
-						<th><?php echo $label; ?></th>
-						<td><?php echo $input; ?></td>
+						<th><?php echo $field_info['label']; ?></th>
+						<td><?php echo $field_info['input']; ?></td>
 					</tr>
 				<?php } ?>
 			</tbody>

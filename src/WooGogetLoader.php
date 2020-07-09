@@ -3,6 +3,7 @@
 namespace ConnectPX\WooGoget;
 
 use ConnectPX\WooGoget\Admin\WooGogetAdmin;
+use ConnectPX\WooGoget\WooGogetWc;
 
 if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
@@ -36,23 +37,18 @@ class WooGogetLoader {
 	}
 
 	public function init() {
-		(new WooGogetAdmin())->init();
+		(new WooGogetFront())->init();
+
+		//if(is_admin()) {
+			(new WooGogetAdmin())->init();
+		//}
 		
 		//if ( class_exists( 'woocommerce' ) ) {
-			add_action( 'woocommerce_shipping_methods', [$this, 'add_shipping_method'] );
-			add_action('woocommerce_shipping_init', [$this, 'include_woocommerce_shipping_method']);
+			(new WooGogetWc())->init();
+
+			
 		//}
 	}
-
-	public function add_shipping_method($methods) {
-		$methods['goget'] = 'WooGogetShippingMethod';
-        return $methods;
-	}
-
-	public function include_woocommerce_shipping_method()
-    {
-        require_once __DIR__ . '/WooGogetShippingMethod.php';
-    }
 }
 
 

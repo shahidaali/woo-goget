@@ -110,7 +110,7 @@ class WooGoget {
 	 */	
 	public function getApi() {
 		$WooGogetApi = new WooGogetApi([
-			'api_key' => $this->get_option('api_key'),
+			'api_key' => $this->get_option('is_sandbox') ? $this->get_option('staging_api_key') : $this->get_option('api_key'),
 			'is_sandbox' => $this->get_option('is_sandbox')
 		]);
 		return $WooGogetApi;

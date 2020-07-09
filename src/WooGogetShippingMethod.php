@@ -2,6 +2,8 @@
 if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 use ConnectPX\WooGoget\WooGogetUtil;
+use ConnectPX\WooGoget\WooGogetGeo;
+use ConnectPX\WooGoget\WooGogetWc;
 
 /**
  * WooGogetShippingMethod
@@ -110,8 +112,18 @@ if( ! class_exists('WooGogetShippingMethod') ) :
 	        }
 	        $deliveryCity    = $package['destination']['city'] ?? '';
         	$deliveryAddress = $package['destination']['address'] ?? '';
-        	$deliveryLat = $package['destination']['lat'] ?? 3.1570648;
-        	$deliveryLng = $package['destination']['lng'] ?? 101.6130658;
+
+        	$WooGogetWc = new WooGogetWc();
+        	$WooGogetWc->save_customer_lat_lng();
+        	$CustomerLatLng = $WooGogetWc->get_customer_delivery_lat_lng();
+
+			$deliveryLat = $CustomerLatLng['lat'];
+			$deliveryLng = $CustomerLatLng['lng'];
+
+        	// $Geo = new WooGogetGeo();
+        	// __pre($Geo->getLatLng($deliveryAddress));
+        
+        	// __pre($post_data);
 
 	    	$data = [
 			    "pickup" => [
@@ -119,7 +131,7 @@ if( ! class_exists('WooGogetShippingMethod') ) :
 			        "location" => $warehouse['address'],
 			        "location_lat" => $warehouse['address_lat'],
 			        "location_long" => $warehouse['address_lng'],
-			        "parking" => true,
+			        "parking" => false,
 			        "start_at" => date('Y-m-d H:i', $pickupTime)
 			    ],
 			    "dropoff" => [
@@ -129,17 +141,17 @@ if( ! class_exists('WooGogetShippingMethod') ) :
 			            "location_long" => $deliveryLng
 			        ]
 			    ],
-			    "ride_id" => 2,
+			    "ride_id" => 1,
 			    "bulky" => false,
-			    "guarantee" => true,
-			    "num_of_items" => '"' . $totalItems . "-" . ($totalItems + 1) . '"',
+			    "guarantee" => false,
+			    "num_of_items" => $totalItems,
 			    "flexi" => false,
 			    "route" => false
 			];
 
 			$data = apply_filters('goget_shipping_data', $data, $warehouse, $package, $this);
 
-			// __pre($data);
+			//__pre($data);
 
 	    	// $weight = 0;
 	     //    $cost = 0;
@@ -155,7 +167,7 @@ if( ! class_exists('WooGogetShippingMethod') ) :
 
 			$api = WooGoget()->getApi();
 			$fee = $api->checkFee($data);
-			// __pre($api);
+			//__pre($api);
 
 			if(!$api->isError()) {
 				$rate = [
